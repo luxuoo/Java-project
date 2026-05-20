@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    # SQL Server 连接参数：
+    # - sendStringParametersAsUnicode=true：保证中文正确写入 NVARCHAR 列
+    # - applicationName：方便在 SQL Server 端排查会话
+    url: jdbc:sqlserver://localhost:1433;databaseName=gym_db;encrypt=false;trustServerCertificate=true;sendStringParametersAsUnicode=true;applicationName=gym-management
+    username: sa
+    password: 123456
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      # 注意：项目实体表均没有 deleted 列，全局逻辑删除已禁用，避免拼接 WHERE deleted = 0 导致的 SQL 错误。
+      # 如需启用软删，请：1) 给所有需要软删的表加 deleted TINYINT DEFAULT 0；
+      #                  2) 在对应实体类的 deleted 字段上加 @TableLogic；
+      #                  3) 这里恢复 logic-delete-field: deleted
+
+jwt:
+  secret: gym-management-system-jwt-secret-key-2024-must-be-at-least-256-bits
+  expiration: 86400000
+
+# 演示开关：仅开发/演示环境使用，启动时把默认账号密码重置成 admin123/coach123/member123
+# 生产环境务必保持 false（默认值），否则用户改完密码重启就被覆盖
+app:
+  demo:
+    reset-passwords: false
